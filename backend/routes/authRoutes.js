@@ -12,8 +12,14 @@ require("../middleware/adminMiddleware");
 
 const router = express.Router();
 router.post("/register", (req, res) => {
-    const { name, email, password } = req.body;
-    const hashedPassword = bcrypt.hashSync(password,10);
+    const {name,email,password} = req.body;
+    if (!name ||!email ||!password
+    ) {
+        return res.status(400).json({
+            message: "All fields are required"
+        });
+    }
+    const hashedPassword =bcrypt.hashSync(password, 10);
     const checkUserSql =
         "SELECT * FROM users WHERE email = ?";
     db.query(
