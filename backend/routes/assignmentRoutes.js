@@ -93,3 +93,4 @@ router.post("/assignments",authMiddleware,adminMiddleware,(req, res) => {
                 });
             });
     });
+module.exports = router;
