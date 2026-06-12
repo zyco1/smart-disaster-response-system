@@ -16,11 +16,12 @@ router.post("/disaster_reports",authMiddleware,(req, res) => {
         severity,
         description
     } = req.body;
-    if(
-    !disaster_type ||
-    !location ||
-    !severity
-){
+    
+    if (
+        !disaster_type?.trim() ||
+        !location?.trim() ||
+        !severity?.trim()
+    ) {
     return res.status(400).json({
         message:"All required fields are mandatory"
     });

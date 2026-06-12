@@ -14,6 +14,16 @@ router.post ("/resources",authMiddleware,adminMiddleware,(req, res) => {
         resource_name,
         quantity,
         location } = req.body;
+        if (
+    !resource_name?.trim() ||
+    !location?.trim() ||
+    quantity === undefined ||
+    quantity === null
+) {
+    return res.status(400).json({
+        message: "All fields are required"
+    });
+}
         const sql = `
         INSERT INTO resources(resource_name,quantity,location)
         VALUES(?,?,?)`;

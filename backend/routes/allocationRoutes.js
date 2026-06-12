@@ -10,11 +10,21 @@ require("../middleware/adminMiddleware");
 
 const router = express.Router();
 router.post("/allocations",authMiddleware,adminMiddleware,(req, res) => {
-        const {
+       const {
             resource_id,
             allocated_quantity,
             allocated_to
         } = req.body;
+    if (
+    resource_id === undefined ||
+    allocated_quantity === undefined ||
+    !allocated_to
+) {
+    return res.status(400).json({
+        message: "All fields are required"
+    });
+}
+    
         const allocated_by = req.user.id;
         const checkSql = `
             SELECT *

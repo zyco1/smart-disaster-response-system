@@ -1,24 +1,31 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const db = require("../config/db");
-
-const authMiddleware =
-require("../middleware/authMiddleware");
-
-const adminMiddleware =
-require("../middleware/adminMiddleware");
-
+const authMiddleware =require("../middleware/authMiddleware");
+const adminMiddleware =require("../middleware/adminMiddleware");
 const router = express.Router();
 router.post("/register", (req, res) => {
     const {name,email,password} = req.body;
-    if (!name ||!email ||!password
+    if ( !name?.trim() ||
+    !email?.trim() ||
+    !password?.trim()
     ) {
         return res.status(400).json({
             message: "All fields are required"
         });
     }
+    if (password.length < 6 || password.length > 50) {
+    return res.status(400).json({
+        message: "Password must be between 6 and 50 characters"
+    });
+}
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(email)) {
+    return res.status(400).json({
+        message: "Invalid email format"
+    });
+}
     const hashedPassword =bcrypt.hashSync(password, 10);
     const checkUserSql =
         "SELECT * FROM users WHERE email = ?";
@@ -53,6 +60,11 @@ router.post("/register", (req, res) => {
 });
 router.post("/login", (req, res) => {
     const { email, password } = req.body;
+        if (!email?.trim() ||!password?.trim()) {
+        return res.status(400).json({
+            message: "Email and Password are required"
+        });
+    }
     const sql =
         "SELECT * FROM users WHERE email = ?";
     db.query(
@@ -102,7 +114,7 @@ router.get("/admin",authMiddleware,adminMiddleware,(req, res)=>{
         user: req.user  
     });
 });
-router.get("/users", (req, res) => {
+router.get("/users",authMiddleware,adminMiddleware,(req, res) => {
     const sql = `
         SELECT
             id,
